@@ -1,1 +1,24 @@
+# ==========================================
+# Compiled Executables and Build Artifacts
+# ==========================================
+*.exe
+*.o
+*.obj
+*.out
+
+# Ignore your compiled application output
 main.exe
+
+# ==========================================
+# Operating System files
+# ==========================================
+Thumbs.db
+.DS_Store
+
+# ==========================================
+# Code Editor Specific (Optional)
+# ==========================================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace

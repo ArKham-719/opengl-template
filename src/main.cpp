@@ -20,7 +20,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // 3. Create the window object
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Intel UHD 620 - OpenGL Test", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "first opengl window", NULL, NULL);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
