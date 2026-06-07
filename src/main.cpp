@@ -1,63 +1,131 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <cmath>
 
-// Callback function to resize the viewport when the user resizes the window
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
-}
+#include"headerfiles/shaderClass.h"
+#include"headerfiles/VBO.h"
+#include"headerfiles/EBO.h"
+#include"headerfiles/VAO.h"
+
+
+
+#define H 800
+#define W 800
+
 
 int main() {
-    // 1. Initialize GLFW
-    if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
-        return -1;
+    //glfw initialize
+    if(!glfwInit())
+    {
+        std::cout << "opengl glfw fail to initialize\n";
+        glfwTerminate();
+        return -1;        
     }
+    //tell the glfw to which opengl verion we are using
+    //in this case we are using 3 the major verion and 3 the minor verion opengl 3.3
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
 
-    // 2. Request an OpenGL 3.3 Core Profile Context from your Intel Driver
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    //which profile we are using compaitable or core  we are using core
+    // which mean we are using only modren feature 
+    glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
 
-    // 3. Create the window object
-    GLFWwindow* window = glfwCreateWindow(800, 600, "first opengl window", NULL, NULL);
-    if (!window) {
-        std::cerr << "Failed to create GLFW window" << std::endl;
+
+    
+    GLfloat vertices[] =
+    {
+        /* -0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,//lower left conner
+        0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,//lower right connor
+        0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f,//upper connor
+        -0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // Inner left
+        0.5f / 2,  0.5f * float(sqrt(3)) / 6 , 0.0f,//Inner right
+        0.0f , -0.5 * float(sqrt(3)) / 3 , 0.0f // Inner down */
+
+        -0.5f,-0.5f,0.0, //lower left coonor
+        -0.5f,0.5f,0.0, //lower right connor
+        0.5f,0.5f,0.0, //upper right
+        0.5f,-0.5f,0.0 // upper left
+        
+    };
+
+    GLuint indicies[] =
+    {
+        /* 0,3,5, // lower right triangle
+        3,2,4, // lower left triangle
+        5,4,1 // upper triangle*/
+        0,1,2, //upper left triangle
+        2,3,0 //lower right triangle
+    };
+    //create window with 800 width and 800 heaght with title and null fullscren
+    GLFWwindow* window = glfwCreateWindow(W,H,"first window",NULL,NULL);
+    if(window == NULL )//Error check if it created or not if not then terminate 
+    {
+        std::cout << "WIndow failed to create\n";
         glfwTerminate();
         return -1;
     }
+
+    //introduce the window into current context
     glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    // 4. Initialize GLAD to load all OpenGL function pointers
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cerr << "Failed to initialize GLAD" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
+    //load glad so it can configure the basic configurations
+    gladLoadGL();
 
-    // 5. Print out system details to confirm your hardware is working
-    std::cout << "GPU Vendor:   " << glGetString(GL_VENDOR) << std::endl;
-    std::cout << "Renderer:     " << glGetString(GL_RENDERER) << std::endl;
-    std::cout << "GL Version:   " << glGetString(GL_VERSION) << std::endl;
+    //specifiy the viewport of opengl in the window
+    //in this case the viewport  goes from  x = 0 , y = 0 to x = 800 , y = 800
+    glViewport(0,0,W,H);
 
-    // 6. Main Application Render Loop
-    while (!glfwWindowShouldClose(window)) {
-        // Process simple Escape key exit input
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-            glfwSetWindowShouldClose(window, true);
-        }
+    Shader shaderProgram("Shaders/default.vert","Shaders/default.frag");
+    
+    VAO VAO1;
+    VAO1.Bind();
 
-        // Render commands go here: Clear the screen to a custom color (R, G, B, A)
-        glClearColor(0.1f, 0.3f, 0.4f, 1.0f);
+    VBO VBO1(vertices, sizeof(vertices));
+    EBO EBO1(indicies, sizeof(indicies));
+    
+    VAO1.LinkVBO(VBO1, 0);
+    VAO1.Unbind();
+    VBO1.Unbind();
+    //EBO1.Unbind();
+    
+  
+    
+    //cleer bg color to this  r g b a 
+    glClearColor(.07f,.13f,.17f,.1f);
+
+    //clean the back buffer
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    //swap the back buffer with front buffer
+    glfwSwapBuffers(window);
+
+    //main loop
+    while(!glfwWindowShouldClose(window))
+    {
+        glClearColor(.07f,.13f,.17f,.1f);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        // Swap back-and-front color buffers and poll user input/window events
+        shaderProgram.Activate();
+        //bind the VAO so opengl know how to use it
+        VAO1.Bind();
+        //Draw the triangle using gl_triangle as primitive
+        glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
         glfwSwapBuffers(window);
+        //event poll
         glfwPollEvents();
     }
 
-    // 7. Clean up all resources properly before exiting
+
+
+    //delete all the Objects 
+    VAO1.Delete();
+    VBO1.Delete();
+    EBO1.Delete();
+    shaderProgram.Delete();  
+    
+    //Destroy the window
+    glfwDestroyWindow(window);
+    //Terminate the glfw
     glfwTerminate();
     return 0;
 
