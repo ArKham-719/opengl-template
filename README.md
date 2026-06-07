@@ -13,11 +13,16 @@ my_opengl_project/
 │   ├── glad/         # GLAD OpenGL loader headers
 │   ├── KHR/          # Khronos cross-platform type mapping
 │   └── GLFW/         # GLFW window configuration headers
+│   └── headerfiles/  # Contain headerfiles like VAO.h VBO.h Shaderclass.h
 ├── lib/              # Pre-compiled static libraries
 │   └── libglfw3.a    # GLFW static binary (MinGW-w64 format)
 └── src/              # Engine source code
     ├── glad.c        # GLAD source mapping
     └── main.cpp      # Application entry point & render loop
+    └── VAO.cpp       # VAO class file
+    └── EBO.cpp       # EBO class file
+    └── shaderClass.cpp     #Shader class CPP file 
+    └── VBO.cpp      # VBO class CPP file
 ```
 
 ## 🛠️ Prerequisites
